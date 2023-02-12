@@ -1,4 +1,3 @@
-const map = new Map()
-
-map.set('asd', 0)
-console.log(map)
+const p = new Promise((res, reject) => {
+    reject(Error('Ошибка!'))
+})

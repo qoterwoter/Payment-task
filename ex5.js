@@ -1,20 +1,31 @@
-module.exports = async function(request, showSpinner, hideSpinner) {
-    const startTime = Date.now();
-    const result = await request();
-    const endTime = Date.now();
-
-    if (endTime - startTime >= 250) {
-        showSpinner();
-        setTimeout(hideSpinner, Math.max(1000 - (endTime - startTime)));
-    }
-    return result;
-};
-
-const sayt = () => console.log('show')
-const sayf = () => console.log('HIDE')
-
-module.exports(() => {
+const fetchData = () => new Promise(resolve => {
     setTimeout(() => {
-        return 'data'
-    }, 500)
-}, sayt, sayf)
+        resolve('Data')
+    }, 350)
+})
+
+module.exports = async(request, show, hide) => {
+    return new Promise((resolve, reject) => {
+        const start = Date.now()
+        const timeoutId = setTimeout(() => {
+            show();
+        }, 250);
+
+        request()
+            .then((data) => {
+                clearTimeout(timeoutId);
+                const end = Date.now()
+
+                if (end - start > 250) {
+                    setTimeout(() => hide(), 1000 - (end - start))
+                }
+                resolve(data);
+            })
+    });
+}
+
+const hideLoadSpinner = () => console.log('hide')
+
+const showLoadSpinner = () => console.log('show')
+
+module.exports(fetchData, showLoadSpinner, hideLoadSpinner)
